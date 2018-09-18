@@ -5,7 +5,10 @@ if (isset($_REQUEST['wait'])) {
     usleep(rand(0, 20) * 100000);
 }
 
-$q = $_GET['q'];
+$q = "";
+if (isset($_GET['q'])) {
+    $q = $_GET['q'];
+}
 
 $pdo = myPDO::getInstance();
 $stmt = $pdo->prepare(<<<SQL
