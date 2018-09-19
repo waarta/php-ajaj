@@ -64,41 +64,56 @@ $p->appendJs(<<<JAVASCRIPT
             }
         }
 
-        // Fonction appelée pour afficher les artistes
-        selectGenres.onclick = function() {
-            viderSelect(selectArtists);
-            // Création de la requête AJAX
+        ajouterOption = function (sel, txt, val) {
+            sel.options.add(new Option(txt, val));
+        }
+
+        charger = function(url,str,sel){
             if(rqAj) rqAj.cancel();
             rqAj = new AjaxRequest(
                 {
-                    url        : "artists.php",
+                    url        : url,
                     method     : 'get',
                     handleAs   : 'json',
-                    parameters : { q : selectGenres.value, wait: true },
+                    parameters : { q : str, wait: true },
                     onSuccess  : function(res) {
+                        console.log(res[0]);
                         for(var i=0;i<res.length;i++)
-                            selectArtists.options.add(new Option(res[i]['txt'], res[i]['id']));
+                            ajouterOption(sel,res[i]['txt'], res[i]['id'])
                         },
                     onError    : function(status, message) {
                             window.alert('Error ' + status + ': ' + message) ;
                         }
                 }) ;
         }
+
+        // Fonction appelée pour afficher les artistes
+        selectGenres.onclick = function() {
+            viderSelect(selectArtists);
+            // Création de la requête AJAX
+            charger("artists.php", selectGenres.value, selectArtists );
+        }
         // Fonction appelée pour afficher les albums
         selectArtists.onclick = function() {
             viderSelect(selectAlbums);
             // Création de la requête AJAX
+            charger("albums.php", selectArtists.value, selectAlbums );
+        }
+        // Fonction appelée pour afficher les songs
+        selectAlbums.onclick = function() {
+            var html ="";
+            // Création de la requête AJAX
             if(rqAj) rqAj.cancel();
             rqAj = new AjaxRequest(
                 {
-                    url        : "albums.php",
+                    url        : "songs.php",
                     method     : 'get',
                     handleAs   : 'json',
-                    parameters : { q : selectArtists.value, wait: true },
+                    parameters : { q : selectAlbums.value, wait: true },
                     onSuccess  : function(res) {
-                        console.log(res)
                         for(var i=0;i<res.length;i++)
-                            selectAlbums.options.add(new Option(res[i]['txt'], res[i]['id']));
+                            html += res[i]['num'] + ' ' + res[i]['name'] + ' ' + res[i]['duration']+'</br>';
+                        document.getElementById('res').innerHTML = html;
                         },
                     onError    : function(status, message) {
                             window.alert('Error ' + status + ': ' + message) ;
